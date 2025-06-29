@@ -2,10 +2,10 @@ package postgres
 
 import (
 	"context"
-	"log"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/misalima/nano-link-backend/src/infra/logger"
 )
 
 func ConnectDatabase(connStr string) (*pgxpool.Pool, error) {
@@ -14,15 +14,15 @@ func ConnectDatabase(connStr string) (*pgxpool.Pool, error) {
 
 	pool, err := pgxpool.New(ctx, connStr)
 	if err != nil {
-		log.Fatal("Error creating database connection: ", err)
+		logger.Error("Error creating database connection: ", err)
 		return nil, err
 	}
 	err = pool.Ping(ctx)
 	if err != nil {
-		log.Fatal("Failed to ping to database: ", err)
+		logger.Error("Failed to ping to database: ", err)
 		return pool, err
 	}
-	log.Println("Successfully connected to database.")
+	logger.Info("Successfully connected to database.")
 	return pool, nil
 
 }

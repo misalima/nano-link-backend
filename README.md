@@ -17,6 +17,7 @@ Nano Link is a RESTful API that provides the following features:
 - Docker
 - Echo (Web Framework)
 - [Tern](https://github.com/jackc/tern) (Database Migration Tool)
+- [Zap](https://github.com/uber-go/zap) (Structured Logging)
 
 ## Getting Started
 
@@ -42,6 +43,11 @@ Nano Link is a RESTful API that provides the following features:
    ```bash
    cp .env.example .env
    ```
+
+   The environment file includes configuration for:
+   - PostgreSQL database connection
+   - Server host and port
+   - Logger environment (development or production)
 
 3. **Export environment variables**
 
@@ -104,7 +110,9 @@ For detailed API documentation, refer to the API documentation (not included in 
 
 - `src/app/api`: API layer (handlers, router, configuration)
 - `src/core`: Domain models and business logic
-- `src/infra`: Infrastructure layer (database repositories)
+- `src/infra`: Infrastructure layer (database repositories, logger)
+  - `src/infra/postgres`: Database repositories
+  - `src/infra/logger`: Structured logging using Zap
 - `config`: Configuration files including database migrations
 
 ### Database Migrations
@@ -123,5 +131,3 @@ To apply migrations:
 ```bash
 tern migrate
 ```
-
-
