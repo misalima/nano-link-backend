@@ -18,14 +18,14 @@ func NewURLVisitRepository(db *pgxpool.Pool) ports.URLVisitRepository {
 	}
 }
 
-func (r *URLVisitRepository) Create(ctx context.Context, visit *domain.URLVisit) error {
+func (r *URLVisitRepository) Save(ctx context.Context, visit *domain.URLVisit) error {
 	panic("unimplemented")
 }
 
-func (r *URLVisitRepository) GetByURLID(ctx context.Context, urlID string) ([]*domain.URLVisit, error) {
+func (r *URLVisitRepository) FetchByURLID(ctx context.Context, urlID string) ([]*domain.URLVisit, error) {
 	panic("unimplemented")
 }
 
-func (r *URLVisitRepository) GetByID(ctx context.Context, id string) (*domain.URLVisit, error) {
+func (r *URLVisitRepository) FetchByID(ctx context.Context, id string) (*domain.URLVisit, error) {
 	panic("unimplemented")
 }

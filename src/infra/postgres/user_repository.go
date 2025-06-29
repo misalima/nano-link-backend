@@ -18,19 +18,19 @@ func NewUserRepository(db *pgxpool.Pool) ports.UserRepository {
 	}
 }
 
-func (r *UserRepository) Create(ctx context.Context, user *domain.User) error {
+func (r *UserRepository) Save(ctx context.Context, user *domain.User) error {
 	panic("unimplemented")
 }
 
-func (r *UserRepository) GetByID(ctx context.Context, id string) (*domain.User, error) {
+func (r *UserRepository) FetchByID(ctx context.Context, id string) (*domain.User, error) {
 	panic("unimplemented")
 }
 
-func (r *UserRepository) GetByUsername(ctx context.Context, username string) (*domain.User, error) {
+func (r *UserRepository) FetchByUsername(ctx context.Context, username string) (*domain.User, error) {
 	panic("unimplemented")
 }
 
-func (r *UserRepository) GetByEmail(ctx context.Context, email string) (*domain.User, error) {
+func (r *UserRepository) FetchByEmail(ctx context.Context, email string) (*domain.User, error) {
 	panic("unimplemented")
 }
 

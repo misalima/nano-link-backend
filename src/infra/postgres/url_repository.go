@@ -18,23 +18,23 @@ func NewURLRepository(db *pgxpool.Pool) ports.URLRepository {
 	}
 }
 
-func (r *URLRepository) Create(ctx context.Context, url *domain.URL) error {
+func (r *URLRepository) Save(ctx context.Context, url *domain.URL) error {
 	panic("unimplemented")
 }
 
-func (r *URLRepository) GetByID(ctx context.Context, id string) (*domain.URL, error) {
+func (r *URLRepository) FetchByID(ctx context.Context, id string) (*domain.URL, error) {
 	panic("unimplemented")
 }
 
-func (r *URLRepository) GetByShortID(ctx context.Context, shortID string) (*domain.URL, error) {
+func (r *URLRepository) FetchByShortID(ctx context.Context, shortID string) (*domain.URL, error) {
 	panic("unimplemented")
 }
 
-func (r *URLRepository) GetByCustomShortID(ctx context.Context, customShortID string) (*domain.URL, error) {
+func (r *URLRepository) FetchByCustomShortID(ctx context.Context, customShortID string) (*domain.URL, error) {
 	panic("unimplemented")
 }
 
-func (r *URLRepository) GetByUserID(ctx context.Context, userID string) ([]*domain.URL, error) {
+func (r *URLRepository) FetchByUserID(ctx context.Context, userID string) ([]*domain.URL, error) {
 	panic("unimplemented")
 }
 

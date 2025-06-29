@@ -18,19 +18,19 @@ func NewTagRepository(db *pgxpool.Pool) ports.TagRepository {
 	}
 }
 
-func (r *TagRepository) Create(ctx context.Context, tag *domain.Tag) error {
+func (r *TagRepository) Save(ctx context.Context, tag *domain.Tag) error {
 	panic("unimplemented")
 }
 
-func (r *TagRepository) GetByID(ctx context.Context, id string) (*domain.Tag, error) {
+func (r *TagRepository) FetchByID(ctx context.Context, id string) (*domain.Tag, error) {
 	panic("unimplemented")
 }
 
-func (r *TagRepository) GetByName(ctx context.Context, name string) (*domain.Tag, error) {
+func (r *TagRepository) FetchByName(ctx context.Context, name string) (*domain.Tag, error) {
 	panic("unimplemented")
 }
 
-func (r *TagRepository) GetAll(ctx context.Context) ([]*domain.Tag, error) {
+func (r *TagRepository) FetchAll(ctx context.Context) ([]*domain.Tag, error) {
 	panic("unimplemented")
 }
 

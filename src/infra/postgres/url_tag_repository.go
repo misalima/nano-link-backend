@@ -18,15 +18,15 @@ func NewURLTagRepository(db *pgxpool.Pool) ports.URLTagRepository {
 	}
 }
 
-func (r *URLTagRepository) Create(ctx context.Context, urlTag *domain.URLTag) error {
+func (r *URLTagRepository) Save(ctx context.Context, urlTag *domain.URLTag) error {
 	panic("unimplemented")
 }
 
-func (r *URLTagRepository) GetByURLID(ctx context.Context, urlID string) ([]*domain.URLTag, error) {
+func (r *URLTagRepository) FetchByURLID(ctx context.Context, urlID string) ([]*domain.URLTag, error) {
 	panic("unimplemented")
 }
 
-func (r *URLTagRepository) GetByTagID(ctx context.Context, tagID string) ([]*domain.URLTag, error) {
+func (r *URLTagRepository) FetchByTagID(ctx context.Context, tagID string) ([]*domain.URLTag, error) {
 	panic("unimplemented")
 }
 

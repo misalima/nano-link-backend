@@ -23,7 +23,6 @@ func main() {
 		log.Fatal("Couldn't connect to database")
 	}
 
-	// Create the dependency injection container
 	c := container.New(db)
 
 	startServer(c)
