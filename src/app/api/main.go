@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/joho/godotenv"
 	"github.com/misalima/nano-link-backend/src/app/api/config"
+	"github.com/misalima/nano-link-backend/src/app/api/container"
 	"github.com/misalima/nano-link-backend/src/app/api/router"
 	"github.com/misalima/nano-link-backend/src/infra/postgres"
 	"log"
@@ -17,16 +18,19 @@ func main() {
 	cfg := config.LoadConfig()
 	connStr := cfg.GetConnString()
 
-	_, err := postgres.ConnectDatabase(connStr)
+	db, err := postgres.ConnectDatabase(connStr)
 	if err != nil {
 		log.Fatal("Couldn't connect to database")
 	}
 
-	startServer()
+	// Create the dependency injection container
+	c := container.New(db)
+
+	startServer(c)
 }
 
-func startServer() {
-	e := router.NewRouter()
+func startServer(c *container.Container) {
+	e := router.NewRouter(c)
 	err := e.Start(":8080")
 	if err != nil {
 		return
