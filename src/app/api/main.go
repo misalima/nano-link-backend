@@ -25,12 +25,12 @@ func main() {
 
 	c := container.New(db)
 
-	startServer(c)
+	startServer(c, cfg.ServerConfig)
 }
 
-func startServer(c *container.Container) {
+func startServer(c *container.Container, config config.ServerConfig) {
 	e := router.NewRouter(c)
-	err := e.Start(":8080")
+	err := e.Start(config.Host + ":" + config.Port)
 	if err != nil {
 		return
 	}
