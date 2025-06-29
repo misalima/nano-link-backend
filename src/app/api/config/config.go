@@ -2,8 +2,9 @@ package config
 
 import (
 	"fmt"
-	"log"
 	"os"
+
+	"github.com/misalima/nano-link-backend/src/infra/logger"
 )
 
 type PostgresConfig struct {
@@ -19,9 +20,14 @@ type ServerConfig struct {
 	Port string
 }
 
+type LoggerConfig struct {
+	Environment string
+}
+
 type Config struct {
 	PostgresConfig PostgresConfig
 	ServerConfig   ServerConfig
+	LoggerConfig   LoggerConfig
 }
 
 func LoadConfig() *Config {
@@ -38,16 +44,21 @@ func LoadConfig() *Config {
 		Port: getEnvOrDefault("SERVER_PORT", "8080"),
 	}
 
+	loggerCfg := LoggerConfig{
+		Environment: getEnvOrDefault("ENVIRONMENT", "development"),
+	}
+
 	return &Config{
 		PostgresConfig: postgresCfg,
 		ServerConfig:   serverCfg,
+		LoggerConfig:   loggerCfg,
 	}
 }
 
 func getEnvOrDefault(key, defaultValue string) string {
 	value, exists := os.LookupEnv(key)
 	if !exists {
-		log.Printf("Couldn't find environment value for: %s. Using default value: %s", value, defaultValue)
+		logger.Infof("Couldn't find environment value for: %s. Using default value: %s", key, defaultValue)
 		return defaultValue
 	}
 	return value
