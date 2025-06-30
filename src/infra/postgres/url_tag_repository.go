@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"github.com/google/uuid"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/misalima/nano-link-backend/src/core/domain"
@@ -22,18 +23,18 @@ func (r *URLTagRepository) Save(ctx context.Context, urlTag *domain.URLTag) erro
 	panic("unimplemented")
 }
 
-func (r *URLTagRepository) FetchByURLID(ctx context.Context, urlID string) ([]*domain.URLTag, error) {
+func (r *URLTagRepository) FetchByURLID(ctx context.Context, urlID uuid.UUID) ([]*domain.URLTag, error) {
 	panic("unimplemented")
 }
 
-func (r *URLTagRepository) FetchByTagID(ctx context.Context, tagID string) ([]*domain.URLTag, error) {
+func (r *URLTagRepository) FetchByTagID(ctx context.Context, tagID uuid.UUID) ([]*domain.URLTag, error) {
 	panic("unimplemented")
 }
 
-func (r *URLTagRepository) Delete(ctx context.Context, id string) error {
+func (r *URLTagRepository) Delete(ctx context.Context, id uuid.UUID) error {
 	panic("unimplemented")
 }
 
-func (r *URLTagRepository) DeleteByURLAndTag(ctx context.Context, urlID, tagID string) error {
+func (r *URLTagRepository) DeleteByURLAndTag(ctx context.Context, urlID, tagID uuid.UUID) error {
 	panic("unimplemented")
 }

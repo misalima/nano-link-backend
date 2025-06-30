@@ -9,6 +9,9 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMP DEFAULT NOW()
     );
 
+INSERT INTO users (id, username, email, password_hash)
+VALUES ('00000000-0000-0000-0000-000000000000', 'anonymous', 'anonymous@example.com', '');
+
 CREATE TABLE IF NOT EXISTS urls (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     short_id VARCHAR(15) UNIQUE NOT NULL,

@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"github.com/google/uuid"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/misalima/nano-link-backend/src/core/domain"
@@ -22,7 +23,7 @@ func (r *UserRepository) Save(ctx context.Context, user *domain.User) error {
 	panic("unimplemented")
 }
 
-func (r *UserRepository) FetchByID(ctx context.Context, id string) (*domain.User, error) {
+func (r *UserRepository) FetchByID(ctx context.Context, id uuid.UUID) (*domain.User, error) {
 	panic("unimplemented")
 }
 
@@ -38,6 +39,6 @@ func (r *UserRepository) Update(ctx context.Context, user *domain.User) error {
 	panic("unimplemented")
 }
 
-func (r *UserRepository) Delete(ctx context.Context, id string) error {
+func (r *UserRepository) Delete(ctx context.Context, id uuid.UUID) error {
 	panic("unimplemented")
 }

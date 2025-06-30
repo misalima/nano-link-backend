@@ -1,11 +1,12 @@
 package domain
 
 import (
+	"github.com/google/uuid"
 	"time"
 )
 
 type User struct {
-	ID           string    `json:"id"`
+	ID           uuid.UUID `json:"id"`
 	Username     string    `json:"username"`
 	Email        string    `json:"email"`
 	PasswordHash string    `json:"-"` // Password hash is not included in JSON responses
@@ -14,6 +15,7 @@ type User struct {
 
 func NewUser(username, email, passwordHash string) *User {
 	return &User{
+		ID:           uuid.New(),
 		Username:     username,
 		Email:        email,
 		PasswordHash: passwordHash,

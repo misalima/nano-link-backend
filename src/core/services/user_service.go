@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"github.com/google/uuid"
 
 	"github.com/misalima/nano-link-backend/src/core/domain"
 	"github.com/misalima/nano-link-backend/src/core/ports"
@@ -25,7 +26,7 @@ func (s *UserService) Authenticate(ctx context.Context, usernameOrEmail, passwor
 	panic("unimplemented")
 }
 
-func (s *UserService) GetUserByID(ctx context.Context, id string) (*domain.User, error) {
+func (s *UserService) GetUserByID(ctx context.Context, id uuid.UUID) (*domain.User, error) {
 	panic("unimplemented")
 }
 
@@ -33,6 +34,6 @@ func (s *UserService) UpdateUser(ctx context.Context, user *domain.User) error {
 	panic("unimplemented")
 }
 
-func (s *UserService) DeleteUser(ctx context.Context, id string) error {
+func (s *UserService) DeleteUser(ctx context.Context, id uuid.UUID) error {
 	panic("unimplemented")
 }

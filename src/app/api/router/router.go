@@ -46,7 +46,7 @@ func setUpRoutes(e *echo.Echo, urlHandler *handlers.URLHandler, tagHandler *hand
 	urls := api.Group("/urls")
 	urls.POST("", urlHandler.CreateShortURL)
 	urls.GET("/:short_id", urlHandler.GetURLDetails)
-	urls.DELETE("/:short_id", urlHandler.DeleteURL)
+	urls.DELETE("/:id", urlHandler.DeleteURL)
 
 	urls.POST("/:short_id/tags", tagHandler.AddTagToURL)
 	urls.DELETE("/:short_id/tags/:tag_id", tagHandler.RemoveTagFromURL)
