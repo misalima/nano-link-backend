@@ -24,6 +24,7 @@ type URLService interface {
 	UpdateURL(ctx context.Context, url *domain.URL) error
 	DeleteURL(ctx context.Context, id, userID uuid.UUID) error
 	RecordVisit(ctx context.Context, urlID uuid.UUID) error
+	GetVisitHistory(ctx context.Context, urlID uuid.UUID) ([]*domain.URLVisit, error)
 }
 
 type TagService interface {

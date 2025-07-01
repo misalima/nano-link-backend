@@ -139,6 +139,10 @@ func (s *URLService) RecordVisit(ctx context.Context, urlID uuid.UUID) error {
 	return nil
 }
 
+func (s *URLService) GetVisitHistory(ctx context.Context, urlID uuid.UUID) ([]*domain.URLVisit, error) {
+	return s.urlVisitRepo.FetchByURLID(ctx, urlID)
+}
+
 func CreateShortIDFromURL(originalURL string) string {
 	shortID, err := utils.HashURLWithRandom(originalURL)
 	if err != nil {
