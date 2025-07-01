@@ -10,11 +10,13 @@ import (
 type Container struct {
 	db *pgxpool.Pool
 
+	userRepo     ports.UserRepository
 	urlRepo      ports.URLRepository
 	tagRepo      ports.TagRepository
 	urlTagRepo   ports.URLTagRepository
 	urlVisitRepo ports.URLVisitRepository
 
+	userService   ports.UserService
 	urlService    ports.URLService
 	tagService    ports.TagService
 	urlTagService ports.URLTagService
@@ -33,6 +35,7 @@ func New(db *pgxpool.Pool) *Container {
 }
 
 func (c *Container) initRepositories() {
+	c.userRepo = postgres.NewUserRepository(c.db)
 	c.urlRepo = postgres.NewURLRepository(c.db)
 	c.tagRepo = postgres.NewTagRepository(c.db)
 	c.urlTagRepo = postgres.NewURLTagRepository(c.db)
@@ -40,6 +43,7 @@ func (c *Container) initRepositories() {
 }
 
 func (c *Container) initServices() {
+	c.userService = services.NewUserService(c.userRepo)
 	c.urlService = services.NewURLService(c.urlRepo, c.urlVisitRepo)
 	c.tagService = services.NewTagService(c.tagRepo)
 	c.urlTagService = services.NewURLTagService(c.urlTagRepo, c.urlRepo, c.tagRepo)
@@ -55,4 +59,8 @@ func (c *Container) TagService() ports.TagService {
 
 func (c *Container) URLTagService() ports.URLTagService {
 	return c.urlTagService
+}
+
+func (c *Container) UserService() ports.UserService {
+	return c.userService
 }

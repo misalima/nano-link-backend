@@ -3,6 +3,7 @@ package auth
 import (
 	"github.com/golang-jwt/jwt/v5"
 	echojwt "github.com/labstack/echo-jwt/v4"
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"os"
@@ -11,7 +12,7 @@ import (
 
 var secretKey []byte
 
-func GenerateToken(userID int, username string) (string, error) {
+func GenerateToken(userID uuid.UUID, username string) (string, error) {
 	secret := os.Getenv("JWT_SECRET")
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -34,4 +35,15 @@ func JWTMiddleware() echo.MiddlewareFunc {
 		ErrorHandler: func(c echo.Context, err error) error {
 			return c.JSON(http.StatusUnauthorized, map[string]string{"message": "unauthorized"})
 		}})
+}
+
+func GetUserIDFromToken(c echo.Context) (uuid.UUID, error) {
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	sub := claims["sub"].(string)
+	userID, err := uuid.Parse(sub)
+	if err != nil {
+		return uuid.Nil, err
+	}
+	return userID, nil
 }

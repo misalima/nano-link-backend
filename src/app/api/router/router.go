@@ -25,16 +25,17 @@ func NewRouter(c *container.Container) *echo.Echo {
 		},
 	}))
 
+	userHandler := handlers.NewUserHandler(c.UserService())
 	urlHandler := handlers.NewURLHandler(c.URLService())
 	tagHandler := handlers.NewTagHandler(c.TagService(), c.URLTagService())
 	visitHandler := handlers.NewVisitHandler(c.URLService())
 
-	setUpRoutes(e, urlHandler, tagHandler, visitHandler)
+	setUpRoutes(e, userHandler, urlHandler, tagHandler, visitHandler)
 
 	return e
 }
 
-func setUpRoutes(e *echo.Echo, urlHandler *handlers.URLHandler, tagHandler *handlers.TagHandler, visitHandler *handlers.VisitHandler) {
+func setUpRoutes(e *echo.Echo, userHandler *handlers.UserHandler, urlHandler *handlers.URLHandler, tagHandler *handlers.TagHandler, visitHandler *handlers.VisitHandler) {
 	e.GET("/:short_id", urlHandler.RedirectToOriginalURL)
 
 	api := e.Group("/api")
@@ -42,6 +43,13 @@ func setUpRoutes(e *echo.Echo, urlHandler *handlers.URLHandler, tagHandler *hand
 	api.GET("/health", func(c echo.Context) error {
 		return c.String(http.StatusOK, "OK")
 	})
+
+	users := api.Group("/users")
+	users.POST("/register", userHandler.Register)
+	users.POST("/login", userHandler.Login)
+	users.GET("/:id", userHandler.GetUserByID)
+	users.PUT("", userHandler.UpdateUser)
+	users.DELETE("", userHandler.DeleteUser)
 
 	urls := api.Group("/urls")
 	urls.POST("", urlHandler.CreateShortURL)
