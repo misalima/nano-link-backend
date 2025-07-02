@@ -37,8 +37,8 @@ type TagService interface {
 }
 
 type URLTagService interface {
-	AddTagToURL(ctx context.Context, urlID, tagID uuid.UUID) error
-	RemoveTagFromURL(ctx context.Context, urlID, tagID uuid.UUID) error
+	AddTagToURL(ctx context.Context, urlID uuid.UUID, tagName string) error
+	RemoveTagFromURL(ctx context.Context, urlID uuid.UUID, tagName string) error
 	GetTagsByURLID(ctx context.Context, urlID uuid.UUID) ([]*domain.Tag, error)
 	GetURLsByTagID(ctx context.Context, tagID uuid.UUID) ([]*domain.URL, error)
 }

@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/misalima/nano-link-backend/src/infra/logger"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -57,6 +58,10 @@ func (r *TagRepository) FetchByName(ctx context.Context, name string) (*domain.T
 	var tag domain.Tag
 	err := row.Scan(&tag.ID, &tag.Name, &tag.CreatedAt)
 	if err != nil {
+		if err == pgx.ErrNoRows {
+			logger.Infof("No tag found with name: %s", name)
+			return nil, domain.ErrTagNameNotFound
+		}
 		logger.Errorf("failed to fetch tag by name: %v", err)
 		return nil, err
 	}

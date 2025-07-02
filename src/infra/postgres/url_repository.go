@@ -2,7 +2,9 @@ package postgres
 
 import (
 	"context"
+	"errors"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/misalima/nano-link-backend/src/infra/logger"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -57,6 +59,10 @@ func (r *URLRepository) FetchByShortID(ctx context.Context, shortID string) (*do
 	var url domain.URL
 	err := row.Scan(&url.ID, &url.ShortID, &url.CustomShortID, &url.OriginalURL, &url.TotalVisits, &url.UserID, &url.CreatedAt)
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			logger.Infof("URL not found for short ID: %s", shortID)
+			return nil, domain.ErrURLNotFound
+		}
 		logger.Errorf("failed to fetch url by short id: %v", err)
 		return nil, err
 	}

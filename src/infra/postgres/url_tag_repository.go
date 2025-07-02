@@ -121,3 +121,14 @@ func (r *URLTagRepository) DeleteByURLAndTag(ctx context.Context, urlID, tagID u
 	logger.Infof("URL-Tag relationship deleted with URL ID: %s and Tag ID: %s", urlID, tagID)
 	return nil
 }
+
+func (r *URLTagRepository) Exists(ctx context.Context, urlID, tagID uuid.UUID) (bool, error) {
+	query := `SELECT EXISTS(SELECT 1 FROM url_tags WHERE url_id = $1 AND tag_id = $2)`
+	var exists bool
+	err := r.db.QueryRow(ctx, query, urlID, tagID).Scan(&exists)
+	if err != nil {
+		logger.Errorf("failed to check if url_tag exists: %v", err)
+		return false, err
+	}
+	return exists, nil
+}

@@ -56,10 +56,12 @@ func setUpRoutes(e *echo.Echo, userHandler *handlers.UserHandler, urlHandler *ha
 	urls.GET("/:short_id", urlHandler.GetURLDetails)
 	urls.DELETE("/:id", urlHandler.DeleteURL)
 
-	urls.POST("/:short_id/tags", tagHandler.AddTagToURL)
-	urls.DELETE("/:short_id/tags/:tag_id", tagHandler.RemoveTagFromURL)
-	urls.GET("/:short_id/tags", tagHandler.GetTagsForURL)
+	urls.POST("/tags", tagHandler.AddTagToURL)
+	urls.DELETE("/:url_id/tags/:tag_name", tagHandler.RemoveTagFromURL)
+	urls.GET("/:url_id/tags", tagHandler.GetTagsForURL)
 
 	urls.GET("/:short_id/visits/count", visitHandler.GetVisitCount)
 	urls.GET("/:short_id/visits", visitHandler.GetVisitHistory)
+
+	api.DELETE("/tags/:id", tagHandler.DeleteTag)
 }

@@ -26,7 +26,7 @@ func (s *URLService) CreateShortURL(ctx context.Context, originalURL string, use
 	err := domain.ValidateURL(originalURL)
 	if err != nil {
 		logger.Errorf("Error validating URL: %v", err)
-		return nil, err
+		return nil, domain.ErrInvalidURL
 	}
 
 	shortID, err := utils.HashURLWithRandom(originalURL)
@@ -53,10 +53,20 @@ func (s *URLService) CreateCustomShortURL(ctx context.Context, originalURL, cust
 		logger.Errorf("Error validating URL: %v", err)
 		return nil, err
 	}
-
 	if customShortID == "" {
 		logger.Error("Custom short ID cannot be empty")
 		return nil, domain.ErrInvalidCustomShortID
+	}
+
+	//Check if custom short id already exists
+	existingURL, err := s.urlRepo.FetchByCustomShortID(ctx, customShortID)
+	if err != nil {
+		logger.Errorf("Error checking existing custom short ID: %v", err)
+		return nil, err
+	}
+	if existingURL != nil {
+		logger.Infof("Custom short ID already exists: %s", customShortID)
+		return nil, domain.ErrCustomShortIDExists
 	}
 
 	url := domain.NewURL(customShortID, originalURL, userID)
@@ -75,7 +85,6 @@ func (s *URLService) CreateCustomShortURL(ctx context.Context, originalURL, cust
 func (s *URLService) GetURLByShortID(ctx context.Context, shortID string) (*domain.URL, error) {
 	url, err := s.urlRepo.FetchByShortID(ctx, shortID)
 	if err != nil {
-		logger.Errorf("failed to get url by short id: %v", err)
 		return nil, err
 	}
 

@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 	"github.com/google/uuid"
-
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/misalima/nano-link-backend/src/core/domain"
 	"github.com/misalima/nano-link-backend/src/core/ports"

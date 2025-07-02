@@ -41,6 +41,7 @@ type URLTagRepository interface {
 	FetchByTagID(ctx context.Context, tagID uuid.UUID) ([]*domain.URLTag, error)
 	Delete(ctx context.Context, id uuid.UUID) error
 	DeleteByURLAndTag(ctx context.Context, urlID, tagID uuid.UUID) error
+	Exists(ctx context.Context, urlID, tagID uuid.UUID) (bool, error)
 }
 
 type URLVisitRepository interface {

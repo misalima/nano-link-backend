@@ -2,8 +2,8 @@ package services
 
 import (
 	"context"
+	"errors"
 	"github.com/google/uuid"
-
 	"github.com/misalima/nano-link-backend/src/core/domain"
 	"github.com/misalima/nano-link-backend/src/core/ports"
 )
@@ -22,7 +22,7 @@ func NewURLTagService(urlTagRepo ports.URLTagRepository, urlRepo ports.URLReposi
 	}
 }
 
-func (s *URLTagService) AddTagToURL(ctx context.Context, urlID, tagID uuid.UUID) error {
+func (s *URLTagService) AddTagToURL(ctx context.Context, urlID uuid.UUID, tagName string) error {
 	url, err := s.urlRepo.FetchByID(ctx, urlID)
 	if err != nil {
 		return err
@@ -31,19 +31,40 @@ func (s *URLTagService) AddTagToURL(ctx context.Context, urlID, tagID uuid.UUID)
 		return domain.ErrURLNotFound
 	}
 
-	tag, err := s.tagRepo.FetchByID(ctx, tagID)
+	var tagID uuid.UUID
+
+	existingTag, err := s.tagRepo.FetchByName(ctx, tagName)
+	if err != nil {
+		if errors.Is(err, domain.ErrTagNotFound) {
+			return err
+		}
+	}
+
+	if existingTag == nil {
+		newTag := domain.NewTag(tagName)
+		err = s.tagRepo.Save(ctx, newTag)
+		if err != nil {
+			return err
+		}
+		tagID = newTag.ID
+	} else {
+		tagID = existingTag.ID
+	}
+
+	urlTagExists, err := s.urlTagRepo.Exists(ctx, urlID, tagID)
 	if err != nil {
 		return err
 	}
-	if tag == nil {
-		return domain.ErrTagNotFound
+
+	if urlTagExists {
+		return nil
 	}
 
 	urlTag := domain.NewURLTag(urlID, tagID)
 	return s.urlTagRepo.Save(ctx, urlTag)
 }
 
-func (s *URLTagService) RemoveTagFromURL(ctx context.Context, urlID, tagID uuid.UUID) error {
+func (s *URLTagService) RemoveTagFromURL(ctx context.Context, urlID uuid.UUID, tagName string) error {
 	url, err := s.urlRepo.FetchByID(ctx, urlID)
 	if err != nil {
 		return err
@@ -52,15 +73,15 @@ func (s *URLTagService) RemoveTagFromURL(ctx context.Context, urlID, tagID uuid.
 		return domain.ErrURLNotFound
 	}
 
-	tag, err := s.tagRepo.FetchByID(ctx, tagID)
+	tag, err := s.tagRepo.FetchByName(ctx, tagName)
 	if err != nil {
 		return err
 	}
 	if tag == nil {
-		return domain.ErrTagNotFound
+		return domain.ErrTagNameNotFound
 	}
 
-	return s.urlTagRepo.DeleteByURLAndTag(ctx, urlID, tagID)
+	return s.urlTagRepo.DeleteByURLAndTag(ctx, urlID, tag.ID)
 }
 
 func (s *URLTagService) GetTagsByURLID(ctx context.Context, urlID uuid.UUID) ([]*domain.Tag, error) {

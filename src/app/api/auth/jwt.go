@@ -2,8 +2,8 @@ package auth
 
 import (
 	"github.com/golang-jwt/jwt/v5"
-	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/google/uuid"
+	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"os"
@@ -38,9 +38,26 @@ func JWTMiddleware() echo.MiddlewareFunc {
 }
 
 func GetUserIDFromToken(c echo.Context) (uuid.UUID, error) {
-	user := c.Get("user").(*jwt.Token)
-	claims := user.Claims.(jwt.MapClaims)
-	sub := claims["sub"].(string)
+	userVal := c.Get("user")
+	if userVal == nil {
+		return uuid.Nil, echo.NewHTTPError(http.StatusUnauthorized, "No token found in context")
+	}
+	user, ok := userVal.(*jwt.Token)
+	if !ok {
+		return uuid.Nil, echo.NewHTTPError(http.StatusUnauthorized, "Invalid token type in context")
+	}
+	claims, ok := user.Claims.(jwt.MapClaims)
+	if !ok {
+		return uuid.Nil, echo.NewHTTPError(http.StatusUnauthorized, "Invalid claims in token")
+	}
+	subVal, ok := claims["sub"]
+	if !ok {
+		return uuid.Nil, echo.NewHTTPError(http.StatusUnauthorized, "No sub claim in token")
+	}
+	sub, ok := subVal.(string)
+	if !ok {
+		return uuid.Nil, echo.NewHTTPError(http.StatusUnauthorized, "sub claim is not a string")
+	}
 	userID, err := uuid.Parse(sub)
 	if err != nil {
 		return uuid.Nil, err

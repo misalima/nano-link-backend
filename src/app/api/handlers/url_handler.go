@@ -3,6 +3,9 @@ package handlers
 import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/misalima/nano-link-backend/src/app/api/auth"
+	"github.com/misalima/nano-link-backend/src/app/api/handlers/dto"
+	"github.com/misalima/nano-link-backend/src/core/domain"
 	"github.com/misalima/nano-link-backend/src/core/ports"
 	"github.com/misalima/nano-link-backend/src/infra/logger"
 	"github.com/misalima/nano-link-backend/src/utils"
@@ -19,14 +22,10 @@ func NewURLHandler(urlService ports.URLService) *URLHandler {
 	}
 }
 
-type CreateShortURLRequest struct {
-	OriginalURL   string    `json:"original_url"`
-	UserID        uuid.UUID `json:"user_id"`
-	CustomShortID string    `json:"custom_short_id,omitempty"`
-}
+type CreateShortURLRequest = dto.CreateURLRequest
 
 func (h *URLHandler) CreateShortURL(c echo.Context) error {
-	var req CreateShortURLRequest
+	var req dto.CreateURLRequest
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{
 			"error": "Invalid request body",
@@ -38,51 +37,57 @@ func (h *URLHandler) CreateShortURL(c echo.Context) error {
 			"error": "Original URL is required",
 		})
 	}
-	if req.CustomShortID != "" {
-		if len(req.CustomShortID) < 3 || len(req.CustomShortID) > 20 {
+	if req.CustomShortID != nil && *req.CustomShortID != "" {
+		if len(*req.CustomShortID) < 3 || len(*req.CustomShortID) > 20 {
 			return c.JSON(http.StatusBadRequest, map[string]string{
 				"error": "Custom short ID must be between 3 and 20 characters",
 			})
 		}
-
-		if !utils.IsValidCustomShortID(req.CustomShortID) {
+		if !utils.IsValidCustomShortID(*req.CustomShortID) {
 			return c.JSON(http.StatusBadRequest, map[string]string{
 				"error": "Custom short ID can only contain alphanumeric characters and hyphens",
 			})
 		}
+	}
 
-		if req.UserID == uuid.Nil {
+	// Chama o serviço e monta a resposta usando o DTO de response
+	var url *domain.URL
+	var err error
+	if req.CustomShortID != nil && *req.CustomShortID != "" {
+		url, err = h.urlService.CreateCustomShortURL(c.Request().Context(), req.OriginalURL, *req.CustomShortID, uuid.Nil)
+	} else {
+		url, err = h.urlService.CreateShortURL(c.Request().Context(), req.OriginalURL, uuid.Nil)
+	}
+	if err != nil || url == nil {
+		if err == domain.ErrInvalidURL {
 			return c.JSON(http.StatusBadRequest, map[string]string{
-				"error": "User ID is required",
+				"error": "Invalid URL format",
 			})
 		}
-		url, err := h.urlService.CreateCustomShortURL(c.Request().Context(), req.OriginalURL, req.CustomShortID, req.UserID)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, map[string]string{
-				"error": "Failed to create custom short URL",
+		if err == domain.ErrInvalidCustomShortID {
+			return c.JSON(http.StatusBadRequest, map[string]string{
+				"error": "Invalid custom short ID",
 			})
 		}
-		if url == nil {
-			return c.JSON(http.StatusInternalServerError, map[string]string{
-				"error": "Failed to create custom short URL",
+		if err == domain.ErrCustomShortIDExists {
+			return c.JSON(http.StatusConflict, map[string]string{
+				"error": "Custom short ID already exists",
 			})
 		}
-		return c.JSON(http.StatusCreated, url)
-	}
-
-	url, err := h.urlService.CreateShortURL(c.Request().Context(), req.OriginalURL, req.UserID)
-	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{
 			"error": "Failed to create short URL",
 		})
 	}
-	if url == nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"error": "Failed to create short URL",
-		})
+	resp := dto.URLResponse{
+		ID:            url.ID.String(),
+		ShortID:       url.ShortID,
+		CustomShortID: url.CustomShortID,
+		OriginalURL:   url.OriginalURL,
+		TotalVisits:   url.TotalVisits,
+		UserID:        url.UserID.String(),
+		CreatedAt:     url.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
 	}
-
-	return c.JSON(http.StatusCreated, url)
+	return c.JSON(http.StatusCreated, resp)
 }
 
 func (h *URLHandler) GetURLDetails(c echo.Context) error {
@@ -141,7 +146,7 @@ func (h *URLHandler) DeleteURL(c echo.Context) error {
 	idStr := c.Param("id")
 	if idStr == "" {
 		return c.JSON(http.StatusBadRequest, map[string]string{
-			"error": "Short ID is required",
+			"error": "URL ID is required",
 		})
 	}
 
@@ -152,22 +157,8 @@ func (h *URLHandler) DeleteURL(c echo.Context) error {
 		})
 	}
 
-	// This is temporary, until we have a proper authentication middleware
-	userIDinterface := c.Get("user_id")
-	if userIDinterface == nil {
-		return c.JSON(http.StatusUnauthorized, map[string]string{
-			"error": "User not authenticated",
-		})
-	}
-	userIDsrt, ok := userIDinterface.(string)
-	if !ok {
-		return c.JSON(http.StatusUnauthorized, map[string]string{
-			"error": "User not authenticated",
-		})
-	}
-
-	userID, err := uuid.Parse(userIDsrt)
-	if userID == uuid.Nil {
+	userID, err := auth.GetUserIDFromToken(c)
+	if err != nil || userID == uuid.Nil {
 		return c.JSON(http.StatusUnauthorized, map[string]string{
 			"error": "User not authenticated",
 		})
